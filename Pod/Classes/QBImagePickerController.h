@@ -28,7 +28,7 @@ UIKIT_EXTERN ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterTyp
 
 @end
 
-@interface QBImagePickerController : UITableViewController
+@interface QBImagePickerController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, strong, readonly) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, copy, readonly) NSArray *assetsGroups;

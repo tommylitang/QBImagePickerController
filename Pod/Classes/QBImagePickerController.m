@@ -34,6 +34,7 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
 
 @interface QBImagePickerController () <QBAssetsCollectionViewControllerDelegate>
 
+@property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong, readwrite) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, copy, readwrite) NSArray *assetsGroups;
 @property (nonatomic, strong, readwrite) NSMutableOrderedSet *selectedAssetURLs;
@@ -47,24 +48,41 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     return ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] &&
             [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum]);
 }
-
-- (instancetype)initWithStyle:(UITableViewStyle)style
+- (instancetype)init
 {
-    self = [super initWithStyle:UITableViewStylePlain];
-    
-    if (self) {
+    self = [super init];
+    if(self) {
+        [self setupTableView];
         [self setupProperties];
         [self setupBottomToolbar];
     }
-    
     return self;
 }
 
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    
     [self setupProperties];
+}
+
+- (void)setupTableView
+{
+    self.tableView = [[UITableView alloc] init];
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    [self.view addSubview:self.tableView];
+    
+    self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    NSArray *arrConstraints = @[
+                               [NSLayoutConstraint constraintWithItem:self.tableView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual
+                                                               toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1.0f constant:0.0f],
+                               [NSLayoutConstraint constraintWithItem:self.tableView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual
+                                                               toItem:self.view attribute:NSLayoutAttributeTop multiplier:1.0f constant:0.0f],
+                               [NSLayoutConstraint constraintWithItem:self.tableView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual
+                                                               toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1.0f constant:0.0f],
+                               [NSLayoutConstraint constraintWithItem:self.tableView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual
+                                                               toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:0.0f]];
+    [self.view addConstraints:arrConstraints];
 }
 
 - (void)setupProperties
@@ -101,7 +119,7 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     [self.view addSubview:toolbar];
     
     toolbar.translatesAutoresizingMaskIntoConstraints = NO;
-    NSArray *arrConstraints = [[NSArray alloc] initWithObjects:
+    NSArray *arrConstraints = @[
                                [NSLayoutConstraint constraintWithItem:toolbar attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual
                                                                toItem:self.view attribute:NSLayoutAttributeBottom  multiplier:1.0f constant:0.0f],
                                [NSLayoutConstraint constraintWithItem:toolbar attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual
@@ -109,7 +127,7 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
                                [NSLayoutConstraint constraintWithItem:toolbar attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual
                                                                toItem:self.view attribute:NSLayoutAttributeWidth   multiplier:1.0f constant:0.0f],
                                [NSLayoutConstraint constraintWithItem:toolbar attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual
-                                                               toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f], nil];
+                                                               toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f]];
     [self.view addConstraints:arrConstraints];
     [self.view bringSubviewToFront:toolbar];
     
