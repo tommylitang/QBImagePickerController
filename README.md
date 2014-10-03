@@ -1,5 +1,5 @@
 # QBImagePickerController
-A clone of UIImagePickerController with multiple selection support.
+A clone of UIImagePickerController with multiple selection support and other useful extensions.
 
 
 ## Installation
