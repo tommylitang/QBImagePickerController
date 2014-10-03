@@ -53,7 +53,8 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     self = [super initWithStyle:UITableViewStylePlain];
     
     if (self) {
-        [self setUpProperties];
+        [self setupProperties];
+        [self setupBottomToolbar];
     }
     
     return self;
@@ -63,10 +64,10 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
 {
     [super awakeFromNib];
     
-    [self setUpProperties];
+    [self setupProperties];
 }
 
-- (void)setUpProperties
+- (void)setupProperties
 {
     // Property settings
     self.selectedAssetURLs = [NSMutableOrderedSet orderedSet];
@@ -90,12 +91,37 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     [self.tableView registerClass:[QBImagePickerGroupCell class] forCellReuseIdentifier:@"GroupCell"];
 }
 
+- (void)setupBottomToolbar
+{
+    NSArray *toolbarItems = @[[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
+                                                                            target:self action:@selector(cameraAction:)]];
+    UIToolbar *toolbar = [[UIToolbar alloc] init];
+    [toolbar setItems:toolbarItems];
+    [self.view addSubview:toolbar];
+    
+    toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+    NSArray *arrConstraints = [[NSArray alloc] initWithObjects:
+                               [NSLayoutConstraint constraintWithItem:toolbar attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual
+                                                               toItem:self.view attribute:NSLayoutAttributeBottom  multiplier:1.0f constant:0.0f],
+                               [NSLayoutConstraint constraintWithItem:toolbar attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual
+                                                               toItem:self.view attribute:NSLayoutAttributeBottom  multiplier:1.0f constant:-44.0f],
+                               [NSLayoutConstraint constraintWithItem:toolbar attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual
+                                                               toItem:self.view attribute:NSLayoutAttributeWidth   multiplier:1.0f constant:0.0f],
+                               [NSLayoutConstraint constraintWithItem:toolbar attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual
+                                                               toItem:self.view attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f], nil];
+    [self.view addConstraints:arrConstraints];
+    [self.view bringSubviewToFront:toolbar];
+    
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     // View controller settings
     self.title = NSLocalizedStringFromTable(@"title", @"QBImagePickerController", nil);
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -159,6 +185,19 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     }
 }
 
+- (void)cameraAction:(id)sender
+{
+    NSLog(@"Opening Camera");
+    
+    UIImagePickerController *cameraPicker = [[UIImagePickerController alloc] init];
+    cameraPicker.allowsEditing = YES;
+    cameraPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    cameraPicker.modalPresentationStyle = UIModalPresentationFullScreen;
+    cameraPicker.showsCameraControls = YES;
+//    cameraPicker.delegate = ...
+    
+    [self presentViewController:cameraPicker animated:YES completion:nil];
+}
 
 #pragma mark - Validating Selections
 
