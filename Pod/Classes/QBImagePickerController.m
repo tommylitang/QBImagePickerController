@@ -32,7 +32,8 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     }
 }
 
-@interface QBImagePickerController () <QBAssetsCollectionViewControllerDelegate>
+@interface QBImagePickerController () <QBAssetsCollectionViewControllerDelegate,
+    UIImagePickerControllerDelegate, UINavigationControllerDelegate> // For camera
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong, readwrite) ALAssetsLibrary *assetsLibrary;
@@ -219,9 +220,23 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     cameraPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
     cameraPicker.modalPresentationStyle = UIModalPresentationFullScreen;
     cameraPicker.showsCameraControls = YES;
-//    cameraPicker.delegate = ...
+    cameraPicker.delegate = self;
     
     [self presentViewController:cameraPicker animated:YES completion:nil];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
+    NSLog(@"Camera took image");
+    [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerEditedImage]).CGImage
+                                            metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
+                                     completionBlock:^(NSURL *assetURL, NSError *error)
+    {
+        if(!error) {
+            [self.selectedAssetURLs addObject:assetURL];
+            [self passSelectedAssetsToDelegate];
+        }
+    }];
 }
 
 #pragma mark - Validating Selections
