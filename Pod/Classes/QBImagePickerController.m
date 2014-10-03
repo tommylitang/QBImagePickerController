@@ -48,6 +48,12 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     return ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary] &&
             [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum]);
 }
+
++ (BOOL)cameraIsAccessible
+{
+    return [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera];
+}
+
 - (instancetype)init
 {
     self = [super init];
@@ -111,11 +117,12 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
 
 - (void)setupBottomToolbar
 {
-    NSArray *toolbarItems = @[[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
-                                                                            target:self action:@selector(cameraAction:)]];
+    UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *cameraButton  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(cameraAction:)];
+    cameraButton.enabled = [QBImagePickerController cameraIsAccessible];
+
     UIToolbar *toolbar = [[UIToolbar alloc] init];
-    [toolbar setItems:toolbarItems];
+    [toolbar setItems:@[flexibleSpace, cameraButton]];
     [self.view addSubview:toolbar];
     
     toolbar.translatesAutoresizingMaskIntoConstraints = NO;
