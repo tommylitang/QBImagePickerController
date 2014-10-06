@@ -34,7 +34,7 @@ UIKIT_EXTERN ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterTyp
 @property (nonatomic, copy, readonly) NSArray *assetsGroups;
 @property (nonatomic, strong, readonly) NSMutableOrderedSet *selectedAssetURLs;
 
-@property (nonatomic, weak) id<QBImagePickerControllerDelegate> delegate;
+@property (nonatomic, weak) id<QBImagePickerControllerDelegate> imagePickerDelegate;
 @property (nonatomic, copy) NSArray *groupTypes;
 @property (nonatomic, assign) QBImagePickerControllerFilterType filterType;
 @property (nonatomic, assign) BOOL showsCancelButton;

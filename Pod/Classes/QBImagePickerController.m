@@ -3,7 +3,7 @@
 //  QBImagePickerController
 //
 //  Created by Tanaka Katsuma on 2013/12/30.
-//  Copyright (c) 2013年 Katsuma Tanaka. All rights reserved.
+//  Copyright (c) 2013 Katsuma Tanaka. All rights reserved.
 //
 
 #import "QBImagePickerController.h"
@@ -16,7 +16,7 @@
 // ViewControllers
 #import "QBAssetsCollectionViewController.h"
 
-ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type) {
+ALAssetsFilter* ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type) {
     switch (type) {
         case QBImagePickerControllerFilterTypeNone:
             return [ALAssetsFilter allAssets];
@@ -32,10 +32,17 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     }
 }
 
-@interface QBImagePickerController () <QBAssetsCollectionViewControllerDelegate,
-    UIImagePickerControllerDelegate, UINavigationControllerDelegate> // For camera
+static const NSInteger NUM_PAGES = 2;
 
-@property (nonatomic, strong) UITableView *tableView;
+@interface QBImagePickerController () <QBAssetsCollectionViewControllerDelegate,
+    UIImagePickerControllerDelegate, UINavigationControllerDelegate, // For camera
+    UICollectionViewDelegate, UICollectionViewDataSource,            // For selected assets collection view
+    UIPageViewControllerDelegate, UIPageViewControllerDataSource>    // For page view controller
+
+@property (nonatomic, strong) UITableView *albumsTableView;
+@property (nonatomic, strong) UICollectionView *selectedAssetsCollectionView;
+
+@property (nonatomic, strong) UISegmentedControl *segmentControl;
 @property (nonatomic, strong, readwrite) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, copy, readwrite) NSArray *assetsGroups;
 @property (nonatomic, strong, readwrite) NSMutableOrderedSet *selectedAssetURLs;
@@ -59,7 +66,8 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
 {
     self = [super init];
     if(self) {
-        [self setupTableView];
+        [self setupAlbumsTableView];
+        [self setupSelectedAssetsCollectionView];
         [self setupProperties];
         [self setupBottomToolbar];
     }
@@ -72,24 +80,31 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     [self setupProperties];
 }
 
-- (void)setupTableView
+- (void)setupAlbumsTableView
 {
-    self.tableView = [[UITableView alloc] init];
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
-    [self.view addSubview:self.tableView];
+    self.albumsTableView = [[UITableView alloc] init];
+    self.albumsTableView.delegate = self;
+    self.albumsTableView.dataSource = self;
+//    [self.view addSubview:self.albumsTableView];
     
-    self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
-    NSArray *arrConstraints = @[
-                               [NSLayoutConstraint constraintWithItem:self.tableView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual
-                                                               toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1.0f constant:0.0f],
-                               [NSLayoutConstraint constraintWithItem:self.tableView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual
-                                                               toItem:self.view attribute:NSLayoutAttributeTop multiplier:1.0f constant:0.0f],
-                               [NSLayoutConstraint constraintWithItem:self.tableView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual
-                                                               toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1.0f constant:0.0f],
-                               [NSLayoutConstraint constraintWithItem:self.tableView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual
-                                                               toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:0.0f]];
-    [self.view addConstraints:arrConstraints];
+//    self.albumsTableView.translatesAutoresizingMaskIntoConstraints = NO;
+//    NSArray *arrConstraints = @[
+//                               [NSLayoutConstraint constraintWithItem:self.albumsTableView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual
+//                                                               toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1.0f constant:0.0f],
+//                               [NSLayoutConstraint constraintWithItem:self.albumsTableView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual
+//                                                               toItem:self.view attribute:NSLayoutAttributeTop multiplier:1.0f constant:0.0f],
+//                               [NSLayoutConstraint constraintWithItem:self.albumsTableView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual
+//                                                               toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1.0f constant:0.0f],
+//                               [NSLayoutConstraint constraintWithItem:self.albumsTableView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual
+//                                                               toItem:self.view attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:0.0f]];
+//    [self.view addConstraints:arrConstraints];
+}
+
+- (void)setupSelectedAssetsCollectionView
+{
+    self.selectedAssetsCollectionView = [[UICollectionView alloc] init];
+    self.selectedAssetsCollectionView.delegate = self;
+    self.selectedAssetsCollectionView.dataSource = self;
 }
 
 - (void)setupProperties
@@ -106,24 +121,45 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
     self.showsCancelButton = YES;
     
     // View settings
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.albumsTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     // Create assets library instance
     ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
     self.assetsLibrary = assetsLibrary;
     
     // Register cell classes
-    [self.tableView registerClass:[QBImagePickerGroupCell class] forCellReuseIdentifier:@"GroupCell"];
+    [self.albumsTableView registerClass:[QBImagePickerGroupCell class] forCellReuseIdentifier:@"GroupCell"];
+}
+
+- (UISegmentedControl *)segmentControl
+{
+    if(!_segmentControl) {
+        _segmentControl = [[UISegmentedControl alloc] initWithItems:@[@"Albums", @"Selected"]];
+        [_segmentControl setEnabled:YES forSegmentAtIndex:0];
+        [_segmentControl addTarget:self action:@selector(segmentControlAction:) forControlEvents:UIControlEventValueChanged];
+    }
+    return _segmentControl;
+}
+
+- (void)segmentControlAction:(id)sender
+{
+    if([sender respondsToSelector:@selector(selectedSegmentIndex)]) {
+//        [sender selectedSegmentIndex]
+#warning Implement me
+    }
 }
 
 - (void)setupBottomToolbar
 {
-    UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIBarButtonItem *cameraButton  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(cameraAction:)];
+    UIBarButtonItem *flexibleSpace  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *cameraButton   = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(cameraAction:)];
+    UIBarButtonItem *segmentControl = [[UIBarButtonItem alloc] initWithCustomView:self.segmentControl];
+
+    
     cameraButton.enabled = [QBImagePickerController cameraIsAccessible];
 
     UIToolbar *toolbar = [[UIToolbar alloc] init];
-    [toolbar setItems:@[flexibleSpace, cameraButton]];
+    [toolbar setItems:@[flexibleSpace, segmentControl, flexibleSpace, cameraButton]];
     [self.view addSubview:toolbar];
     
     toolbar.translatesAutoresizingMaskIntoConstraints = NO;
@@ -159,13 +195,55 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
                          completion:^(NSArray *assetsGroups) {
                              self.assetsGroups = assetsGroups;
                              
-                             [self.tableView reloadData];
+                             [self.albumsTableView reloadData];
                          }];
     
     // Validation
     self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
 }
 
+#pragma mark - Page View Controller
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
+{
+    NSUInteger index = [self indexOfViewController:viewController];
+    if ((index == 0) || (index == NSNotFound)) {
+        return nil;
+    }
+    
+    index--;
+    return [self viewControllerAtIndex:index];
+}
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController
+{
+    NSUInteger index = [self indexOfViewController:viewController];
+    if (index == NSNotFound) {
+        return nil;
+    }
+    
+    index++;
+    if (index == NUM_PAGES) {
+        return nil;
+    }
+    return [self viewControllerAtIndex:index];
+}
+
+- (NSInteger)indexOfViewController:(UIViewController *)viewController {
+    if([viewController isKindOfClass:[UITableView class]]) {
+        return 0;
+    } else if([viewController isKindOfClass:[UICollectionView class]]) {
+        return 1;
+    }
+    return NSNotFound;
+}
+
+- (UIViewController *)viewControllerAtIndex:(NSInteger)index {
+    if(index == 0) {
+        return self.albumsTableView;
+    }
+    return nil;
+}
 
 #pragma mark - Accessors
 
@@ -206,8 +284,8 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
 - (void)cancel:(id)sender
 {
     // Delegate
-    if (self.delegate && [self.delegate respondsToSelector:@selector(qb_imagePickerControllerDidCancel:)]) {
-		[self.delegate qb_imagePickerControllerDidCancel:self];
+    if (self.imagePickerDelegate && [self.imagePickerDelegate respondsToSelector:@selector(qb_imagePickerControllerDidCancel:)]) {
+		[self.imagePickerDelegate qb_imagePickerControllerDidCancel:self];
     }
 }
 
@@ -344,8 +422,8 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
                                 // Check if the loading finished
                                 if (assets.count == weakSelf.selectedAssetURLs.count) {
                                     // Delegate
-                                    if (self.delegate && [self.delegate respondsToSelector:@selector(qb_imagePickerController:didSelectAssets:)]) {
-										[self.delegate qb_imagePickerController:self didSelectAssets:[assets copy]];
+                                    if (self.imagePickerDelegate && [self.imagePickerDelegate respondsToSelector:@selector(qb_imagePickerController:didSelectAssets:)]) {
+										[self.imagePickerDelegate qb_imagePickerController:self didSelectAssets:[assets copy]];
                                     }
                                 }
                             } failureBlock:^(NSError *error) {
@@ -419,8 +497,8 @@ ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePick
         self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
     } else {
         // Delegate
-        if (self.delegate && [self.delegate respondsToSelector:@selector(qb_imagePickerController:didSelectAsset:)]) {
-			[self.delegate qb_imagePickerController:self didSelectAsset:asset];
+        if (self.imagePickerDelegate && [self.imagePickerDelegate respondsToSelector:@selector(qb_imagePickerController:didSelectAsset:)]) {
+			[self.imagePickerDelegate qb_imagePickerController:self didSelectAsset:asset];
         }
     }
 }
