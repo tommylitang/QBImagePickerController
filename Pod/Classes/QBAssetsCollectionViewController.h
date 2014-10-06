@@ -10,7 +10,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 
 // ViewControllers
-#import "QBImagePickerController.h"
+#import "QBAlbumsTableViewController.h"
 
 @class QBAssetsCollectionViewController;
 
@@ -25,7 +25,7 @@
 
 @interface QBAssetsCollectionViewController : UICollectionViewController <UICollectionViewDelegateFlowLayout>
 
-@property (nonatomic, weak) QBImagePickerController *imagePickerController;
+@property (nonatomic, weak) QBAlbumsTableViewController *imagePickerController;
 
 @property (nonatomic, weak) id<QBAssetsCollectionViewControllerDelegate> delegate;
 @property (nonatomic, strong) ALAssetsGroup *assetsGroup;
