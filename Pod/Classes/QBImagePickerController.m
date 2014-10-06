@@ -101,12 +101,11 @@
 - (QBAssetsCollectionViewController *)selectedAssetsController
 {
     if(!_selectedAssetsController) {
-        _selectedAssetsController = [[QBAssetsCollectionViewController alloc] initWithCollectionViewLayout:[QBAssetsCollectionViewLayout layout]];
+        _selectedAssetsController = [[QBAssetsCollectionViewController alloc]
+                                     initWithCollectionViewLayout:[QBAssetsCollectionViewLayout layout]];
 
-        
         _selectedAssetsController.allowsMultipleSelection = YES;
         _selectedAssetsController.filterType = self.albumsController.filterType;
-//        _selectedAssetsController.imagePickerController = self.albumsController;
         _selectedAssetsController.minimumNumberOfSelection = self.albumsController.minimumNumberOfSelection;
         _selectedAssetsController.maximumNumberOfSelection = self.albumsController.maximumNumberOfSelection;
         _selectedAssetsController.delegate = (id<QBAssetsCollectionViewControllerDelegate>)self.albumsController;
