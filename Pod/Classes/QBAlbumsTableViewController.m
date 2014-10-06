@@ -12,8 +12,6 @@
 // Views
 #import "QBImagePickerGroupCell.h"
 #import "QBAssetsCollectionViewLayout.h"
-
-// ViewControllers
 #import "QBAssetsCollectionViewController.h"
 
 ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type) {
@@ -115,7 +113,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     [super viewDidAppear:animated];
     
     // Validation
-    self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
+    [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelections:self.selectedAssetURLs.count]];
 }
 
 #pragma mark - Accessors

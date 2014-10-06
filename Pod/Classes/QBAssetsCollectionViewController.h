@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 
-// ViewControllers
+// View Controllers
 #import "QBAlbumsTableViewController.h"
 
 @class QBAssetsCollectionViewController;

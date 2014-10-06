@@ -113,15 +113,9 @@ static const NSInteger NUM_PAGES = 2;
 //        _selectedAssetsController.imagePickerController = self.albumsController;
         _selectedAssetsController.minimumNumberOfSelection = self.albumsController.minimumNumberOfSelection;
         _selectedAssetsController.maximumNumberOfSelection = self.albumsController.maximumNumberOfSelection;
-        
-//        ALAssetsGroup *assetsGroup = self.assetsGroups[indexPath.row];
-//        assetsCollectionViewController.delegate = self;
-//        assetsCollectionViewController.assetsGroup = assetsGroup;
-        
-        for (NSURL *assetURL in self.albumsController.selectedAssetURLs) {
-            [_selectedAssetsController selectAssetHavingURL:assetURL];
-        }
+        _selectedAssetsController.delegate = (id<QBAssetsCollectionViewControllerDelegate>)self.albumsController;
     }
+
     return _selectedAssetsController;
 }
 
