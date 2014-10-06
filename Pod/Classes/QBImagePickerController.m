@@ -8,15 +8,15 @@
 
 #import "QBImagePickerController.h"
 #import "QBAlbumsTableViewController.h"
-#import "QBSelectedAssetsCollectionViewController.h"
+#import "QBAssetsCollectionViewLayout.h"
 
 static const NSInteger NUM_PAGES = 2;
 
-@interface QBImagePickerController () <UIPageViewControllerDelegate, UIPageViewControllerDataSource>
+@interface QBImagePickerController ()
 
 @property (nonatomic, strong) UIPageViewController *pageViewController;
 @property (nonatomic, strong) UISegmentedControl *segmentControl;
-
+@property (nonatomic, assign) NSInteger selectedIndex;
 @end
 
 @implementation QBImagePickerController
@@ -28,14 +28,24 @@ static const NSInteger NUM_PAGES = 2;
 {
     self = [super init];
     if(self) {
-        [self setupPageView];
-        [self setupBottomToolbar];
+        self.selectedIndex = 0;
     }
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor whiteColor];
+    
+    [self setupPageView];
+    [self setupBottomToolbar];
+    [self setupNavigationBar];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.navigationController.navigationBar.translucent = NO;
 }
 
 #pragma mark - Segment Control
@@ -44,7 +54,7 @@ static const NSInteger NUM_PAGES = 2;
 {
     if(!_segmentControl) {
         _segmentControl = [[UISegmentedControl alloc] initWithItems:@[@"Albums", @"Selected"]];
-        [_segmentControl setEnabled:YES forSegmentAtIndex:0];
+        _segmentControl.selectedSegmentIndex = 0;
         [_segmentControl addTarget:self action:@selector(segmentControlAction:) forControlEvents:UIControlEventValueChanged];
     }
     return _segmentControl;
@@ -54,7 +64,9 @@ static const NSInteger NUM_PAGES = 2;
 {
     if([sender respondsToSelector:@selector(selectedSegmentIndex)]) {
         UIViewController *viewController = [self viewControllerAtIndex:[sender selectedSegmentIndex]];
-        [self.pageViewController setViewControllers:@[viewController] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+        UIPageViewControllerNavigationDirection direction = [sender selectedSegmentIndex] > self.selectedIndex
+                ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
+        [self.pageViewController setViewControllers:@[viewController] direction:direction animated:YES completion:nil];
     }
 }
 
@@ -90,10 +102,25 @@ static const NSInteger NUM_PAGES = 2;
 
 #pragma mark - Selected Assets Controller
 
-- (QBSelectedAssetsCollectionViewController *)selectedAssetsController
+- (QBAssetsCollectionViewController *)selectedAssetsController
 {
     if(!_selectedAssetsController) {
-        _selectedAssetsController = [[QBSelectedAssetsCollectionViewController alloc] init];
+        _selectedAssetsController = [[QBAssetsCollectionViewController alloc] initWithCollectionViewLayout:[QBAssetsCollectionViewLayout layout]];
+
+        
+        _selectedAssetsController.allowsMultipleSelection = YES;
+        _selectedAssetsController.filterType = self.albumsController.filterType;
+//        _selectedAssetsController.imagePickerController = self.albumsController;
+        _selectedAssetsController.minimumNumberOfSelection = self.albumsController.minimumNumberOfSelection;
+        _selectedAssetsController.maximumNumberOfSelection = self.albumsController.maximumNumberOfSelection;
+        
+//        ALAssetsGroup *assetsGroup = self.assetsGroups[indexPath.row];
+//        assetsCollectionViewController.delegate = self;
+//        assetsCollectionViewController.assetsGroup = assetsGroup;
+        
+        for (NSURL *assetURL in self.albumsController.selectedAssetURLs) {
+            [_selectedAssetsController selectAssetHavingURL:assetURL];
+        }
     }
     return _selectedAssetsController;
 }
@@ -138,14 +165,12 @@ static const NSInteger NUM_PAGES = 2;
     self.pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
                                                               navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
                                                                             options:nil];
+    
     [self.pageViewController setViewControllers:@[self.albumsController] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
-    self.pageViewController.dataSource = self;
-    self.pageViewController.delegate = self;
     
     [self addChildViewController:self.pageViewController];
     [self.view addSubview:self.pageViewController.view];
     [self.pageViewController didMoveToParentViewController:self];
-    self.view.gestureRecognizers = self.pageViewController.view.gestureRecognizers;
     
     UIView *pageView = self.pageViewController.view;
     pageView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -200,10 +225,19 @@ static const NSInteger NUM_PAGES = 2;
     if(index == 0) {
         return self.albumsController;
     } else if(index == 1) {
-        return self.albumsController;        
-//        return self.selectedAssetsController;
+        return self.selectedAssetsController;
     }
     return nil;
+}
+
+#pragma mark - Navigation Bar
+
+- (void)setupNavigationBar
+{
+//    UIBarButtonItem *cancelBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:nil action:nil];
+//    UIBarButtonItem *doneBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:nil action:nil];
+    self.navigationItem.leftBarButtonItem  = self.albumsController.navigationItem.leftBarButtonItem;
+    self.navigationItem.rightBarButtonItem = self.albumsController.navigationItem.rightBarButtonItem;
 }
 
 @end

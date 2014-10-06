@@ -9,12 +9,12 @@
 #import <UIKit/UIKit.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "QBAlbumsTableViewController.h"
-#import "QBSelectedAssetsCollectionViewController.h"
+#import "QBAssetsCollectionViewController.h"
 
 @interface QBImagePickerController : UIViewController
 
 @property (nonatomic, strong, readonly) QBAlbumsTableViewController *albumsController;
-@property (nonatomic, strong, readonly) QBSelectedAssetsCollectionViewController *selectedAssetsController;
+@property (nonatomic, strong, readonly) QBAssetsCollectionViewController *selectedAssetsController;
 
 + (BOOL)isAccessible;
 + (BOOL)cameraIsAccessible;

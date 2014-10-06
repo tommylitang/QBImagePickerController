@@ -63,10 +63,20 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     return self;
 }
 
-- (void)awakeFromNib
+- (void)viewDidLoad
 {
-    [super awakeFromNib];
-    [self setupProperties];
+    [super viewDidLoad];
+    
+    // Register cell classes
+    [self.tableView registerClass:[QBImagePickerGroupCell class] forCellReuseIdentifier:@"GroupCell"];
+    
+    self.showsCancelButton = YES;
+    
+    // View settings
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    
+    // View controller settings
+    self.title = NSLocalizedStringFromTable(@"title", @"QBAlbumsTableViewController", nil);
 }
 
 - (void)setupProperties
@@ -80,26 +90,10 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
                         @(ALAssetsGroupAlbum)
                         ];
     self.filterType = QBImagePickerControllerFilterTypeNone;
-    self.showsCancelButton = YES;
-    
-    // View settings
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     // Create assets library instance
     ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
     self.assetsLibrary = assetsLibrary;
-    
-    // Register cell classes
-    [self.tableView registerClass:[QBImagePickerGroupCell class] forCellReuseIdentifier:@"GroupCell"];
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    
-    // View controller settings
-    self.title = NSLocalizedStringFromTable(@"title", @"QBAlbumsTableViewController", nil);
-    
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -111,6 +105,14 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         self.assetsGroups = assetsGroups;
         [self.tableView reloadData];
     }];
+    
+//    // Validation
+//    self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
     
     // Validation
     self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
@@ -143,7 +145,6 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         [self.navigationItem setRightBarButtonItem:nil animated:NO];
     }
 }
-
 
 #pragma mark - Actions
 
