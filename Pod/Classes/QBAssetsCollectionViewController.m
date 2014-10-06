@@ -130,6 +130,37 @@
     [self.collectionView reloadData];
 }
 
+- (void)setAlAssets:(NSMutableArray *)alAssets
+{
+    // Load assets
+    NSMutableArray *assets = [NSMutableArray array];
+    __block NSUInteger numberOfAssets = 0;
+    __block NSUInteger numberOfPhotos = 0;
+    __block NSUInteger numberOfVideos = 0;
+    
+    [alAssets enumerateObjectsUsingBlock:^(ALAsset *asset, NSUInteger index, BOOL *stop) {
+        NSString *type = [asset valueForProperty:ALAssetPropertyType];
+        BOOL filtered = [type isEqual:ALAssetsFilterFromQBImagePickerControllerFilterType(self.filterType)];
+        
+        if (asset && !filtered) {
+            numberOfAssets++;
+            
+            if ([type isEqualToString:ALAssetTypePhoto]) numberOfPhotos++;
+            else if ([type isEqualToString:ALAssetTypeVideo]) numberOfVideos++;
+            
+            [assets addObject:asset];
+        }
+    }];
+    
+    self.assets = assets;
+    self.numberOfAssets = numberOfAssets;
+    self.numberOfPhotos = numberOfPhotos;
+    self.numberOfVideos = numberOfVideos;
+    
+    // Update view
+    [self.collectionView reloadData];
+}
+
 - (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
 {
     self.collectionView.allowsMultipleSelection = allowsMultipleSelection;

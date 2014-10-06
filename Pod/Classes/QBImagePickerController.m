@@ -10,13 +10,10 @@
 #import "QBAlbumsTableViewController.h"
 #import "QBAssetsCollectionViewLayout.h"
 
-static const NSInteger NUM_PAGES = 2;
-
 @interface QBImagePickerController ()
 
 @property (nonatomic, strong) UIPageViewController *pageViewController;
 @property (nonatomic, strong) UISegmentedControl *segmentControl;
-@property (nonatomic, assign) NSInteger selectedIndex;
 @end
 
 @implementation QBImagePickerController
@@ -24,22 +21,12 @@ static const NSInteger NUM_PAGES = 2;
 @synthesize albumsController = _albumsController;
 @synthesize selectedAssetsController = _selectedAssetsController;
 
-- (instancetype)init
-{
-    self = [super init];
-    if(self) {
-        self.selectedIndex = 0;
-    }
-    return self;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     
     [self setupPageView];
     [self setupBottomToolbar];
-    [self setupNavigationBar];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -63,9 +50,18 @@ static const NSInteger NUM_PAGES = 2;
 - (void)segmentControlAction:(id)sender
 {
     if([sender respondsToSelector:@selector(selectedSegmentIndex)]) {
-        UIViewController *viewController = [self viewControllerAtIndex:[sender selectedSegmentIndex]];
-        UIPageViewControllerNavigationDirection direction = [sender selectedSegmentIndex] > self.selectedIndex
-                ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
+        NSInteger selectedIndex = [sender selectedSegmentIndex];
+        UIPageViewControllerNavigationDirection direction;
+        UIViewController *viewController;
+        if(selectedIndex == 0) {
+            viewController = self.albumsController;
+            direction = UIPageViewControllerNavigationDirectionReverse;
+        } else {
+            viewController = self.selectedAssetsController;
+            direction = UIPageViewControllerNavigationDirectionForward;
+            [self passAssetsToAssetsControllerAndSelect];
+        }
+
         [self.pageViewController setViewControllers:@[viewController] direction:direction animated:YES completion:nil];
     }
 }
@@ -117,6 +113,31 @@ static const NSInteger NUM_PAGES = 2;
     }
 
     return _selectedAssetsController;
+}
+
+- (void)passAssetsToAssetsControllerAndSelect
+{
+    // Load assets from URLs
+    __block NSMutableArray *assets = [NSMutableArray array];
+    
+    for (NSURL *selectedAssetURL in self.albumsController.selectedAssetURLs) {
+        __weak typeof(self) weakSelf = self;
+        [self.albumsController.assetsLibrary assetForURL:selectedAssetURL resultBlock:^(ALAsset *asset) {
+            [assets addObject:asset];
+            
+            // If load complete
+            if (assets.count == weakSelf.albumsController.selectedAssetURLs.count) {
+                [weakSelf.selectedAssetsController setAlAssets:assets];
+                
+                for (NSURL *assetURL in weakSelf.albumsController.selectedAssetURLs) {
+                    [weakSelf.selectedAssetsController selectAssetHavingURL:assetURL];
+                }
+                
+            }
+        } failureBlock:^(NSError *error) {
+            NSLog(@"Error: %@", [error localizedDescription]);
+        }];
+    }
 }
 
 #pragma mark - Bottom Toolbar
@@ -179,59 +200,6 @@ static const NSInteger NUM_PAGES = 2;
                                         toItem:self.view attribute:NSLayoutAttributeTrailing   multiplier:1.0f constant:0.0f]
     ];
     [self.view addConstraints:arrConstraints];
-}
-
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
-{
-    NSUInteger index = [self indexOfViewController:viewController];
-    if ((index == 0) || (index == NSNotFound)) {
-        return nil;
-    }
-    
-    index--;
-    return [self viewControllerAtIndex:index];
-}
-
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController
-{
-    NSUInteger index = [self indexOfViewController:viewController];
-    if (index == NSNotFound) {
-        return nil;
-    }
-    
-    index++;
-    if (index == NUM_PAGES) {
-        return nil;
-    }
-    return [self viewControllerAtIndex:index];
-}
-
-- (NSInteger)indexOfViewController:(UIViewController *)viewController {
-    if([viewController isKindOfClass:[UITableView class]]) {
-        return 0;
-    } else if([viewController isKindOfClass:[UICollectionView class]]) {
-        return 1;
-    }
-    return NSNotFound;
-}
-
-- (UIViewController *)viewControllerAtIndex:(NSInteger)index {
-    if(index == 0) {
-        return self.albumsController;
-    } else if(index == 1) {
-        return self.selectedAssetsController;
-    }
-    return nil;
-}
-
-#pragma mark - Navigation Bar
-
-- (void)setupNavigationBar
-{
-//    UIBarButtonItem *cancelBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:nil action:nil];
-//    UIBarButtonItem *doneBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:nil action:nil];
-    self.navigationItem.leftBarButtonItem  = self.albumsController.navigationItem.leftBarButtonItem;
-    self.navigationItem.rightBarButtonItem = self.albumsController.navigationItem.rightBarButtonItem;
 }
 
 @end

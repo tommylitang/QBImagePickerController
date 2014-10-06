@@ -35,5 +35,6 @@
 @property (nonatomic, assign) NSUInteger maximumNumberOfSelection;
 
 - (void)selectAssetHavingURL:(NSURL *)URL;
+- (void)setAlAssets:(NSMutableArray *)alAssets;
 
 @end
