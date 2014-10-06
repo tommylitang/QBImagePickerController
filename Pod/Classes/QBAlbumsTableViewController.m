@@ -16,7 +16,7 @@
 // ViewControllers
 #import "QBAssetsCollectionViewController.h"
 
-ALAssetsFilter* ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type) {
+ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type) {
     switch (type) {
         case QBImagePickerControllerFilterTypeNone:
             return [ALAssetsFilter allAssets];
@@ -155,8 +155,8 @@ ALAssetsFilter* ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 - (void)cancel:(id)sender
 {
     // Delegate
-    if (self.imagePickerDelegate && [self.imagePickerDelegate respondsToSelector:@selector(qb_imagePickerControllerDidCancel:)]) {
-		[self.imagePickerDelegate qb_imagePickerControllerDidCancel:self];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(qb_imagePickerControllerDidCancel:)]) {
+		[self.delegate qb_imagePickerControllerDidCancel:self];
     }
 }
 
@@ -293,8 +293,8 @@ ALAssetsFilter* ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
                                 // Check if the loading finished
                                 if (assets.count == weakSelf.selectedAssetURLs.count) {
                                     // Delegate
-                                    if (self.imagePickerDelegate && [self.imagePickerDelegate respondsToSelector:@selector(qb_imagePickerController:didSelectAssets:)]) {
-										[self.imagePickerDelegate qb_imagePickerController:self didSelectAssets:[assets copy]];
+                                    if (self.delegate && [self.delegate respondsToSelector:@selector(qb_imagePickerController:didSelectAssets:)]) {
+										[self.delegate qb_imagePickerController:self didSelectAssets:[assets copy]];
                                     }
                                 }
                             } failureBlock:^(NSError *error) {
@@ -368,8 +368,8 @@ ALAssetsFilter* ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
     } else {
         // Delegate
-        if (self.imagePickerDelegate && [self.imagePickerDelegate respondsToSelector:@selector(qb_imagePickerController:didSelectAsset:)]) {
-			[self.imagePickerDelegate qb_imagePickerController:self didSelectAsset:asset];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(qb_imagePickerController:didSelectAsset:)]) {
+			[self.delegate qb_imagePickerController:self didSelectAsset:asset];
         }
     }
 }

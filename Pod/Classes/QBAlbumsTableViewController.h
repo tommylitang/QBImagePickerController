@@ -3,7 +3,7 @@
 //  QBImagePickerController
 //
 //  Created by Tanaka Katsuma on 2013/12/30.
-//  Copyright (c) 2013年 Katsuma Tanaka. All rights reserved.
+//  Copyright (c) 2013 Katsuma Tanaka. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -15,7 +15,7 @@ typedef NS_ENUM(NSUInteger, QBImagePickerControllerFilterType) {
     QBImagePickerControllerFilterTypeVideos
 };
 
-UIKIT_EXTERN ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type);
+UIKIT_EXTERN ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type);
 
 @class QBAlbumsTableViewController;
 
@@ -34,7 +34,7 @@ UIKIT_EXTERN ALAssetsFilter * ALAssetsFilterFromQBImagePickerControllerFilterTyp
 @property (nonatomic, copy, readonly) NSArray *assetsGroups;
 @property (nonatomic, strong, readonly) NSMutableOrderedSet *selectedAssetURLs;
 
-@property (nonatomic, weak) id<QBImagePickerControllerDelegate> imagePickerDelegate;
+@property (nonatomic, weak) id<QBImagePickerControllerDelegate> delegate;
 @property (nonatomic, copy) NSArray *groupTypes;
 @property (nonatomic, assign) QBImagePickerControllerFilterType filterType;
 @property (nonatomic, assign) BOOL showsCancelButton;

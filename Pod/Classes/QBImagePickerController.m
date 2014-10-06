@@ -14,8 +14,6 @@ static const NSInteger NUM_PAGES = 2;
 
 @interface QBImagePickerController () <UIPageViewControllerDelegate, UIPageViewControllerDataSource>
 
-@property (nonatomic, strong) QBAlbumsTableViewController *albumsController;
-@property (nonatomic, strong) QBSelectedAssetsCollectionViewController *selectedAssetsController;
 @property (nonatomic, strong) UIPageViewController *pageViewController;
 @property (nonatomic, strong) UISegmentedControl *segmentControl;
 
@@ -23,12 +21,15 @@ static const NSInteger NUM_PAGES = 2;
 
 @implementation QBImagePickerController
 
+@synthesize albumsController = _albumsController;
+@synthesize selectedAssetsController = _selectedAssetsController;
+
 - (instancetype)init
 {
     self = [super init];
     if(self) {
-        [self setupBottomToolbar];
         [self setupPageView];
+        [self setupBottomToolbar];
     }
     return self;
 }
@@ -57,12 +58,54 @@ static const NSInteger NUM_PAGES = 2;
     }
 }
 
+#pragma mark - Albums Controller
+
+- (QBAlbumsTableViewController *)albumsController
+{
+    if(!_albumsController) {
+        _albumsController = [[QBAlbumsTableViewController alloc] init];
+    }
+    return _albumsController;
+}
+
+- (void)setDelegate:(id<QBImagePickerControllerDelegate>)delegate
+{
+    self.albumsController.delegate = delegate;
+}
+
+- (id<QBImagePickerControllerDelegate>)delegate
+{
+    return self.albumsController.delegate;
+}
+
++ (BOOL)isAccessible
+{
+    return [QBAlbumsTableViewController isAccessible];
+}
+
++ (BOOL)cameraIsAccessible
+{
+    return [QBAlbumsTableViewController cameraIsAccessible];
+}
+
+#pragma mark - Selected Assets Controller
+
+- (QBSelectedAssetsCollectionViewController *)selectedAssetsController
+{
+    if(!_selectedAssetsController) {
+        _selectedAssetsController = [[QBSelectedAssetsCollectionViewController alloc] init];
+    }
+    return _selectedAssetsController;
+}
+
 #pragma mark - Bottom Toolbar
 
 - (void)setupBottomToolbar
 {
-    UIBarButtonItem *flexibleSpace  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIBarButtonItem *cameraButton   = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(cameraAction:)];
+    UIBarButtonItem *flexibleSpace  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                    target:nil action:nil];
+    UIBarButtonItem *cameraButton   = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
+                                                                                    target:self.albumsController action:@selector(cameraAction:)];
     UIBarButtonItem *segmentControl = [[UIBarButtonItem alloc] initWithCustomView:self.segmentControl];
     
     
@@ -95,6 +138,7 @@ static const NSInteger NUM_PAGES = 2;
     self.pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
                                                               navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
                                                                             options:nil];
+    [self.pageViewController setViewControllers:@[self.albumsController] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
     self.pageViewController.dataSource = self;
     self.pageViewController.delegate = self;
     
@@ -156,7 +200,8 @@ static const NSInteger NUM_PAGES = 2;
     if(index == 0) {
         return self.albumsController;
     } else if(index == 1) {
-        return self.selectedAssetsController;
+        return self.albumsController;        
+//        return self.selectedAssetsController;
     }
     return nil;
 }
