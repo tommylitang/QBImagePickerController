@@ -74,7 +74,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     // View controller settings
-    self.title = NSLocalizedStringFromTable(@"title", @"QBAlbumsTableViewController", nil);
+    self.title = NSLocalizedStringFromTable(@"title", @"QBImagePickerController", nil);
 }
 
 - (void)setupProperties
@@ -104,16 +104,16 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         [self.tableView reloadData];
     }];
     
-//    // Validation
-//    self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
+    // Validation
+    [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelections:self.selectedAssetURLs.count]];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     
-    // Validation
-    [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelections:self.selectedAssetURLs.count]];
+
+    
 }
 
 #pragma mark - Accessors
@@ -389,5 +389,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 {
     [self passSelectedAssetsToDelegate];
 }
+
+
 
 @end

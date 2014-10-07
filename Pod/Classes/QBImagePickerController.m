@@ -21,17 +21,25 @@
 @synthesize albumsController = _albumsController;
 @synthesize selectedAssetsController = _selectedAssetsController;
 
-- (void)viewDidLoad {
+//#error Done button stays selected after disappear. Fix this!
+//#error Modal freezes as we wait for assets.
+
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     
     [self setupPageView];
     [self setupBottomToolbar];
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    [self setupNavigationBar];
+    
     self.navigationController.navigationBar.translucent = NO;
 }
 
@@ -199,6 +207,13 @@
                                         toItem:self.view attribute:NSLayoutAttributeTrailing   multiplier:1.0f constant:0.0f]
     ];
     [self.view addConstraints:arrConstraints];
+}
+
+- (void)setupNavigationBar
+{
+    self.navigationItem.leftBarButtonItem  = self.albumsController.navigationItem.leftBarButtonItem;
+    self.title = self.albumsController.title;
+    self.navigationItem.rightBarButtonItem = self.albumsController.navigationItem.rightBarButtonItem;
 }
 
 @end
