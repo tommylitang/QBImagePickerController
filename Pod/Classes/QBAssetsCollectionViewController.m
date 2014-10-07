@@ -43,6 +43,7 @@
     
     // View settings
     self.collectionView.backgroundColor = [UIColor whiteColor];
+    self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, 44.f, 0); // For toolbar
     
     // Register cell class
     [self.collectionView registerClass:[QBAssetsCollectionViewCell class]
@@ -345,32 +346,19 @@
                 } else {
                     format = @"format_photos_and_videos";
                 }
-                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTable(format,
-                                                                                                  @"QBImagePickerController",
-                                                                                                  nil),
-                                                                                                  self.numberOfPhotos,
-                                                                                                  self.numberOfVideos
-                                                                                                  ];
+                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedString(format, nil), self.numberOfPhotos, self.numberOfVideos];
                 break;
             }
                 
             case QBImagePickerControllerFilterTypePhotos:{
                 NSString *format = (self.numberOfPhotos == 1) ? @"format_photo" : @"format_photos";
-                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTable(format,
-                                                                                                  @"QBImagePickerController",
-                                                                                                  nil),
-                                                                                                  self.numberOfPhotos
-                                                                                                  ];
+                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedString(format, nil), self.numberOfPhotos];
                 break;
             }
                 
             case QBImagePickerControllerFilterTypeVideos:{
                 NSString *format = (self.numberOfVideos == 1) ? @"format_video" : @"format_videos";
-                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedStringFromTable(format,
-                                                                                                  @"QBImagePickerController",
-                                                                                                  nil),
-                                                                                                  self.numberOfVideos
-                                                                                                  ];
+                footerView.textLabel.text = [NSString stringWithFormat:NSLocalizedString(format, nil), self.numberOfVideos];
                 break;
             }
         }

@@ -74,7 +74,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     // View controller settings
-    self.title = NSLocalizedStringFromTable(@"title", @"QBImagePickerController", nil);
+    self.title = NSLocalizedString(@"title", nil);
 }
 
 - (void)setupProperties
