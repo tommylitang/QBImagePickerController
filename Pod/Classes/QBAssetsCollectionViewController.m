@@ -30,7 +30,7 @@
 {
     self = [super initWithCollectionViewLayout:layout];
     
-    if (self) {
+    if(self) {
 
     }
     
@@ -128,14 +128,18 @@
 - (void)clearSelection:(id)sender
 {
     for(NSInteger i = 0; i < [self.collectionView numberOfItemsInSection:0]; i++) {
-        [self.collectionView deselectItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0] animated:YES];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
+        [self.collectionView deselectItemAtIndexPath:indexPath animated:YES];
+        [self collectionView:self.collectionView didDeselectItemAtIndexPath:indexPath]; // Not called automatically
     }
 }
 
 - (void)selectAll:(id)sender
 {
     for(NSInteger i = 0; i < [self.collectionView numberOfItemsInSection:0]; i++) {
-        [self.collectionView selectItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionNone];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForItem:i inSection:0];
+        [self.collectionView selectItemAtIndexPath:indexPath animated:YES scrollPosition:UICollectionViewScrollPositionNone];
+        [self collectionView:self.collectionView didSelectItemAtIndexPath:indexPath];
     }
 }
 
