@@ -124,9 +124,11 @@
 
 - (void)passAssetsToAssetsControllerAndSelect
 {
+    // Reset then ...
+    [self.selectedAssetsController setAlAssets:nil];
+    
     // Load assets from URLs
     __block NSMutableArray *assets = [NSMutableArray array];
-    
     for (NSURL *selectedAssetURL in self.albumsController.selectedAssetURLs) {
         __weak typeof(self) weakSelf = self;
         [self.albumsController.assetsLibrary assetForURL:selectedAssetURL resultBlock:^(ALAsset *asset) {
@@ -177,6 +179,8 @@
     ];
     [self.view addConstraints:arrConstraints];
     [self.view bringSubviewToFront:toolbar];
+    
+    toolbar.translucent = NO;
 }
 
 #pragma mark - Page View Controller

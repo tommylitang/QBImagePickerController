@@ -31,18 +31,25 @@
     self = [super initWithCollectionViewLayout:layout];
     
     if (self) {
-        // View settings
-        self.collectionView.backgroundColor = [UIColor whiteColor];
-        
-        // Register cell class
-        [self.collectionView registerClass:[QBAssetsCollectionViewCell class]
-                forCellWithReuseIdentifier:@"AssetsCell"];
-        [self.collectionView registerClass:[QBAssetsCollectionFooterView class]
-                forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
-                       withReuseIdentifier:@"FooterView"];
+
     }
     
     return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    // View settings
+    self.collectionView.backgroundColor = [UIColor whiteColor];
+    
+    // Register cell class
+    [self.collectionView registerClass:[QBAssetsCollectionViewCell class]
+            forCellWithReuseIdentifier:@"AssetsCell"];
+    [self.collectionView registerClass:[QBAssetsCollectionFooterView class]
+            forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+                   withReuseIdentifier:@"FooterView"];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -66,6 +73,8 @@
     if (self.allowsMultipleSelection) {
         self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.imagePickerController.selectedAssetURLs.count];
     }
+    
+    [self setupBottomToolbar];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -82,6 +91,53 @@
     self.disableScrollToBottom = NO;
 }
 
+#pragma mark - Bottom Toolbar
+
+- (void)setupBottomToolbar
+{
+    UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *clear = [[UIBarButtonItem alloc] initWithTitle:@"Clear" style:UIBarButtonItemStylePlain target:self action:@selector(clearSelection:)];
+    UIBarButtonItem *selectAll = [[UIBarButtonItem alloc] initWithTitle:@"Select All" style:UIBarButtonItemStylePlain target:self action:@selector(selectAll:)];
+    
+    if(!self.allowsMultipleSelection) {
+        clear.enabled     = NO;
+        selectAll.enabled = NO;
+    }
+    
+    UIToolbar *toolbar = [[UIToolbar alloc] init];
+    [toolbar setItems:@[clear, flexibleSpace, selectAll]];
+    [self.view addSubview:toolbar];
+    
+    toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+    NSArray *arrConstraints = @[
+        [NSLayoutConstraint constraintWithItem:toolbar   attribute:NSLayoutAttributeBottom  relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view attribute:NSLayoutAttributeBottom    multiplier:1.0f constant:0.0f],
+        [NSLayoutConstraint constraintWithItem:toolbar   attribute:NSLayoutAttributeTop     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view attribute:NSLayoutAttributeBottom    multiplier:1.0f constant:-44.0f],
+        [NSLayoutConstraint constraintWithItem:toolbar   attribute:NSLayoutAttributeWidth   relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view attribute:NSLayoutAttributeWidth     multiplier:1.0f constant:0.0f],
+        [NSLayoutConstraint constraintWithItem:toolbar   attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual
+                                        toItem:self.view attribute:NSLayoutAttributeCenterX   multiplier:1.0f constant:0.0f]
+    ];
+    [self.view addConstraints:arrConstraints];
+    [self.view bringSubviewToFront:toolbar];
+    
+    toolbar.translucent = NO;
+}
+
+- (void)clearSelection:(id)sender
+{
+    for(NSInteger i = 0; i < [self.collectionView numberOfItemsInSection:0]; i++) {
+        [self.collectionView deselectItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0] animated:YES];
+    }
+}
+
+- (void)selectAll:(id)sender
+{
+    for(NSInteger i = 0; i < [self.collectionView numberOfItemsInSection:0]; i++) {
+        [self.collectionView selectItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionNone];
+    }
+}
 
 #pragma mark - Accessors
 

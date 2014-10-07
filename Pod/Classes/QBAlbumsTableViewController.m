@@ -108,14 +108,6 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelections:self.selectedAssetURLs.count]];
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-
-    
-}
-
 #pragma mark - Accessors
 
 - (void)setShowsCancelButton:(BOOL)showsCancelButton
