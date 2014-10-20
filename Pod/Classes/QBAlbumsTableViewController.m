@@ -34,7 +34,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     UIImagePickerControllerDelegate, UINavigationControllerDelegate> // For camera
 
 @property (nonatomic, strong, readwrite) ALAssetsLibrary *assetsLibrary;
-@property (nonatomic, copy, readwrite) NSArray *assetsGroups;
+@property (nonatomic, copy,   readwrite) NSArray *assetsGroups;
 @property (nonatomic, strong, readwrite) NSMutableOrderedSet *selectedAssetURLs;
 
 @end
@@ -92,6 +92,8 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     // Create assets library instance
     ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
     self.assetsLibrary = assetsLibrary;
+    
+    self.rightNavigationItemTitle = @"Done";
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -106,6 +108,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     
     // Validation
     [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelections:self.selectedAssetURLs.count]];
+    [self.navigationItem.rightBarButtonItem setTitle:self.rightNavigationItemTitle];
 }
 
 #pragma mark - Accessors
@@ -129,7 +132,8 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     
     // Show/hide done button
     if (allowsMultipleSelection) {
-        UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
+        UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:self.rightNavigationItemTitle
+                style:UIBarButtonItemStyleDone target:self action:@selector(done:)];
         [self.navigationItem setRightBarButtonItem:doneButton animated:NO];
     } else {
         [self.navigationItem setRightBarButtonItem:nil animated:NO];

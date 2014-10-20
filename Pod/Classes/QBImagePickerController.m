@@ -21,9 +21,6 @@
 @synthesize albumsController = _albumsController;
 @synthesize selectedAssetsController = _selectedAssetsController;
 
-//#error Done button stays selected after disappear. Fix this!
-//#error Modal freezes as we wait for assets.
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];

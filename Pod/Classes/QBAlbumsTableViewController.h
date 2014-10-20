@@ -31,7 +31,7 @@ UIKIT_EXTERN ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType
 @interface QBAlbumsTableViewController : UITableViewController
 
 @property (nonatomic, strong, readonly) ALAssetsLibrary *assetsLibrary;
-@property (nonatomic, copy, readonly) NSArray *assetsGroups;
+@property (nonatomic, copy,   readonly) NSArray *assetsGroups;
 @property (nonatomic, strong, readonly) NSMutableOrderedSet *selectedAssetURLs;
 
 @property (nonatomic, weak) id<QBImagePickerControllerDelegate> delegate;
@@ -41,6 +41,7 @@ UIKIT_EXTERN ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType
 @property (nonatomic, assign) BOOL allowsMultipleSelection;
 @property (nonatomic, assign) NSUInteger minimumNumberOfSelection;
 @property (nonatomic, assign) NSUInteger maximumNumberOfSelection;
+@property (nonatomic, assign) NSString *rightNavigationItemTitle;
 
 + (BOOL)isAccessible;
 + (BOOL)cameraIsAccessible;
