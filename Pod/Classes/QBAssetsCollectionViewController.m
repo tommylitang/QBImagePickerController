@@ -26,17 +26,6 @@
 
 @implementation QBAssetsCollectionViewController
 
-- (instancetype)initWithCollectionViewLayout:(UICollectionViewLayout *)layout
-{
-    self = [super initWithCollectionViewLayout:layout];
-    
-    if(self) {
-
-    }
-    
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -73,6 +62,7 @@
     // Validation
     if (self.allowsMultipleSelection) {
         self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.imagePickerController.selectedAssetURLs.count];
+        [self.navigationItem.rightBarButtonItem setTitle:self.imagePickerController.rightNavigationItemTitle];
     }
     
     [self setupBottomToolbar];
@@ -228,7 +218,8 @@
     
     // Show/hide done button
     if (allowsMultipleSelection) {
-        UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done:)];
+        UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:self.imagePickerController.rightNavigationItemTitle
+            style:UIBarButtonItemStyleDone target:self action:@selector(done:)];
         [self.navigationItem setRightBarButtonItem:doneButton animated:NO];
     } else {
         [self.navigationItem setRightBarButtonItem:nil animated:NO];

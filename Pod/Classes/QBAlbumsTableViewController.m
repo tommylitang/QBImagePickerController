@@ -133,7 +133,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     // Show/hide done button
     if (allowsMultipleSelection) {
         UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:self.rightNavigationItemTitle
-                style:UIBarButtonItemStyleDone target:self action:@selector(done:)];
+            style:UIBarButtonItemStyleDone target:self action:@selector(done:)];
         [self.navigationItem setRightBarButtonItem:doneButton animated:NO];
     } else {
         [self.navigationItem setRightBarButtonItem:nil animated:NO];
@@ -385,7 +385,4 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 {
     [self passSelectedAssetsToDelegate];
 }
-
-
-
 @end
