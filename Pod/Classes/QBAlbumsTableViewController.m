@@ -173,7 +173,6 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 {
     [self dismissViewControllerAnimated:YES completion:nil];
     NSLog(@"Camera took image");
-    [self dismissViewControllerAnimated:YES completion:^{}];
     
     [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerEditedImage]).CGImage
                                             metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
