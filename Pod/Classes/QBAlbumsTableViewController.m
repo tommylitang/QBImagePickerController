@@ -173,12 +173,10 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 {
     [self dismissViewControllerAnimated:YES completion:nil];
     NSLog(@"Camera took image");
-    
-    [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerEditedImage]).CGImage
+    [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerOriginalImage]).CGImage
                                             metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
-                                     completionBlock:^(NSURL *assetURL, NSError *error)
-     {
-         if(!error) {
+                                     completionBlock:^(NSURL *assetURL, NSError *error) {
+         if(!error && assetURL != nil) {
              [self.selectedAssetURLs addObject:assetURL];
              [self passSelectedAssetsToDelegate];
          }
