@@ -160,7 +160,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     NSLog(@"Opening Camera");
     
     UIImagePickerController *cameraPicker = [[UIImagePickerController alloc] init];
-    cameraPicker.allowsEditing = YES;
+//    cameraPicker.allowsEditing = YES;
     cameraPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
     cameraPicker.modalPresentationStyle = UIModalPresentationFullScreen;
     cameraPicker.showsCameraControls = YES;
@@ -171,6 +171,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
+    [self dismissViewControllerAnimated:YES completion:nil];
     NSLog(@"Camera took image");
     [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerEditedImage]).CGImage
                                             metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
