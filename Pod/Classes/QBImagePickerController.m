@@ -217,4 +217,10 @@
     self.navigationItem.rightBarButtonItem = self.albumsController.navigationItem.rightBarButtonItem;
 }
 
+- (void)provideDestinationViewController:(UIViewController *)destinationViewController {
+    
+    @throw [NSException exceptionWithName:@"FMUnavailableOperationException" reason:@"This operation is not permitted." userInfo:nil];
+    
+}
+
 @end
