@@ -111,25 +111,9 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     }];
     
     // Validation
-    NSArray *selectedAssets = [self selectedAlAssets];
-    [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages:selectedAssets]
-                                                                                           videoCount:[self numberOfSelectedVideos:selectedAssets]]];
+    [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages]
+                                                                                           videoCount:[self numberOfSelectedVideos]]];
     [self.navigationItem.rightBarButtonItem setTitle:self.rightNavigationItemTitle];
-}
-
-- (NSArray *)selectedAlAssets
-{
-    return nil;
-}
-
-- (NSUInteger)numberOfSelectedVideos:(NSArray *)alAssets
-{
-    return 0;
-}
-
-- (NSUInteger)numberOfSelectedImages:(NSArray *)alAssets
-{
-    return 0;
 }
 
 #pragma mark - Accessors
@@ -237,13 +221,36 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
         qualifiesMaximumNumberOfSelection = (imageCount <= self.maximumNumberOfImageSelection);
     }
-    if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
+    if (minimumNumberOfVideoSelection <= self.maximumNumberOfVideoSelection) {
         qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection || (videoCount <= self.maximumNumberOfVideoSelection);
     }
     
     return (qualifiesMinimumNumberOfSelection && qualifiesMaximumNumberOfSelection);
 }
 
+- (NSUInteger)numberOfSelectedImages
+{
+    NSUInteger imageCount = 0;
+    for(NSURL *url in self.selectedAssetURLs) {
+        CFStringRef uttype = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)[url pathExtension], NULL);
+        if (UTTypeConformsTo(uttype, kUTTypeImage)) {
+            imageCount++;
+        }
+    }
+    return imageCount;
+}
+
+- (NSUInteger)numberOfSelectedVideos
+{
+    NSUInteger videoCount = 0;
+    for(NSURL *url in self.selectedAssetURLs) {
+        CFStringRef uttype = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)[url pathExtension], NULL);
+        if (UTTypeConformsTo(uttype, kUTTypeMovie)) {
+            videoCount++;
+        }
+    }
+    return videoCount;
+}
 
 #pragma mark - Managing Assets
 
@@ -407,9 +414,8 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         [self.selectedAssetURLs addObject:assetURL];
         
         // Validation
-        NSArray *selectedAssets = [self selectedAlAssets];
-        [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages:selectedAssets]
-                                                                                               videoCount:[self numberOfSelectedVideos:selectedAssets]]];
+        [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages]
+                                                                                               videoCount:[self numberOfSelectedVideos]]];
     } else {
         // Delegate
         if (self.delegate && [self.delegate respondsToSelector:@selector(qb_imagePickerController:didSelectAsset:)]) {
@@ -426,9 +432,8 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         [self.selectedAssetURLs removeObject:assetURL];
         
         // Validation
-        NSArray *selectedAssets = [self selectedAlAssets];
-        [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages:selectedAssets]
-                                                                                               videoCount:[self numberOfSelectedVideos:selectedAssets]]];
+        [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages]
+                                                                                               videoCount:[self numberOfSelectedVideos]]];
     }
 }
 
