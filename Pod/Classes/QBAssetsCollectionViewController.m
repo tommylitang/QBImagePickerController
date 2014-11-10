@@ -270,9 +270,10 @@
 - (BOOL)validateNumberOfSelectionsWithImageCount:(NSUInteger)imageCount videoCount:(NSUInteger)videoCount
 {
     // Check the number of selected assets
-    NSUInteger minimumNumberOfImageSelection = MAX(1, self.minimumNumberOfImageSelection);
-    NSUInteger minimumNumberOfVideoSelection = MAX(1, self.minimumNumberOfVideoSelection);
-    BOOL qualifiesMinimumNumberOfSelection = (imageCount >= minimumNumberOfImageSelection) && (videoCount >= minimumNumberOfVideoSelection);
+    NSUInteger minimumNumberOfImageSelection = MAX(0 /* 1 */, self.minimumNumberOfImageSelection);
+    NSUInteger minimumNumberOfVideoSelection = MAX(0 /* 1 */, self.minimumNumberOfVideoSelection);
+    BOOL qualifiesMinimumNumberOfSelection = (imageCount >= minimumNumberOfImageSelection)
+        && (videoCount >= minimumNumberOfVideoSelection) && imageCount + videoCount >= 1;
     
     BOOL qualifiesMaximumNumberOfSelection = YES;
     if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
@@ -287,8 +288,8 @@
 
 - (BOOL)validateMaximumNumberOfSelectionsWithImageCount:(NSUInteger)imageCount videoCount:(NSUInteger)videoCount
 {
-    NSUInteger minimumNumberOfImageSelection = MAX(1, self.minimumNumberOfImageSelection);
-    NSUInteger minimumNumberOfVideoSelection = MAX(1, self.minimumNumberOfVideoSelection);
+    NSUInteger minimumNumberOfImageSelection = MAX(0 /* 1 */, self.minimumNumberOfImageSelection);
+    NSUInteger minimumNumberOfVideoSelection = MAX(0 /* 1 */, self.minimumNumberOfVideoSelection);
     
     BOOL qualifiesMaximumNumberOfSelection = YES;
     if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
