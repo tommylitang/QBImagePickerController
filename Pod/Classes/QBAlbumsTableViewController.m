@@ -111,7 +111,8 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     }];
     
     // Validation
-    [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelections:self.selectedAssetURLs.count]];
+    [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages]
+                                                                                           videoCount:[self numberOfSelectedVideos]]];
     [self.navigationItem.rightBarButtonItem setTitle:self.rightNavigationItemTitle];
 }
 
@@ -209,20 +210,47 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 
 #pragma mark - Validating Selections
 
-- (BOOL)validateNumberOfSelections:(NSUInteger)numberOfSelections
+- (BOOL)validateNumberOfSelectionsWithImageCount:(NSUInteger)imageCount videoCount:(NSUInteger)videoCount
 {
     // Check the number of selected assets
-    NSUInteger minimumNumberOfSelection = MAX(1, self.minimumNumberOfSelection);
-    BOOL qualifiesMinimumNumberOfSelection = (numberOfSelections >= minimumNumberOfSelection);
+    NSUInteger minimumNumberOfImageSelection = MAX(1, self.minimumNumberOfImageSelection);
+    NSUInteger minimumNumberOfVideoSelection = MAX(1, self.minimumNumberOfVideoSelection);
+    BOOL qualifiesMinimumNumberOfSelection = (imageCount >= minimumNumberOfImageSelection) && (videoCount >= minimumNumberOfVideoSelection);
     
     BOOL qualifiesMaximumNumberOfSelection = YES;
-    if (minimumNumberOfSelection <= self.maximumNumberOfSelection) {
-        qualifiesMaximumNumberOfSelection = (numberOfSelections <= self.maximumNumberOfSelection);
+    if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
+        qualifiesMaximumNumberOfSelection = (imageCount <= self.maximumNumberOfImageSelection);
+    }
+    if (minimumNumberOfVideoSelection <= self.maximumNumberOfVideoSelection) {
+        qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection || (videoCount <= self.maximumNumberOfVideoSelection);
     }
     
     return (qualifiesMinimumNumberOfSelection && qualifiesMaximumNumberOfSelection);
 }
 
+- (NSUInteger)numberOfSelectedImages
+{
+    NSUInteger imageCount = 0;
+    for(NSURL *url in self.selectedAssetURLs) {
+        CFStringRef uttype = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)[url pathExtension], NULL);
+        if (UTTypeConformsTo(uttype, kUTTypeImage)) {
+            imageCount++;
+        }
+    }
+    return imageCount;
+}
+
+- (NSUInteger)numberOfSelectedVideos
+{
+    NSUInteger videoCount = 0;
+    for(NSURL *url in self.selectedAssetURLs) {
+        CFStringRef uttype = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)[url pathExtension], NULL);
+        if (UTTypeConformsTo(uttype, kUTTypeMovie)) {
+            videoCount++;
+        }
+    }
+    return videoCount;
+}
 
 #pragma mark - Managing Assets
 
@@ -359,8 +387,10 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     assetsCollectionViewController.imagePickerController = self;
     assetsCollectionViewController.filterType = self.filterType;
     assetsCollectionViewController.allowsMultipleSelection = self.allowsMultipleSelection;
-    assetsCollectionViewController.minimumNumberOfSelection = self.minimumNumberOfSelection;
-    assetsCollectionViewController.maximumNumberOfSelection = self.maximumNumberOfSelection;
+    assetsCollectionViewController.minimumNumberOfImageSelection = self.minimumNumberOfImageSelection;
+    assetsCollectionViewController.minimumNumberOfVideoSelection = self.minimumNumberOfVideoSelection;
+    assetsCollectionViewController.maximumNumberOfImageSelection = self.maximumNumberOfImageSelection;
+    assetsCollectionViewController.maximumNumberOfVideoSelection = self.maximumNumberOfVideoSelection;
     
     ALAssetsGroup *assetsGroup = self.assetsGroups[indexPath.row];
     assetsCollectionViewController.delegate = self;
@@ -384,7 +414,8 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         [self.selectedAssetURLs addObject:assetURL];
         
         // Validation
-        self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
+        [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages]
+                                                                                               videoCount:[self numberOfSelectedVideos]]];
     } else {
         // Delegate
         if (self.delegate && [self.delegate respondsToSelector:@selector(qb_imagePickerController:didSelectAsset:)]) {
@@ -401,7 +432,8 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         [self.selectedAssetURLs removeObject:assetURL];
         
         // Validation
-        self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
+        [self.navigationItem.rightBarButtonItem setEnabled:[self validateNumberOfSelectionsWithImageCount:[self numberOfSelectedImages]
+                                                                                               videoCount:[self numberOfSelectedVideos]]];
     }
 }
 
