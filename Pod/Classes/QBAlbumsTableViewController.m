@@ -14,6 +14,8 @@
 #import "QBAssetsCollectionViewLayout.h"
 #import "QBAssetsCollectionViewController.h"
 
+#import "Util.h"
+
 ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type) {
     switch (type) {
         case QBImagePickerControllerFilterTypeNone:
@@ -161,6 +163,16 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     
     UIImagePickerController *cameraPicker = [[UIImagePickerController alloc] init];
 //    cameraPicker.allowsEditing = YES;
+
+    NSArray *supportedTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
+    NSArray *videoSupported = [supportedTypes filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"(SELF contains %@)", @"movie"]];
+    if([videoSupported count] > 0) {
+        DLog(@"Video capture supported");
+    } else {
+        DLog(@"Video capture unsupported");
+    }
+
+    cameraPicker.mediaTypes = supportedTypes; // Enable all supported media types
     cameraPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
     cameraPicker.modalPresentationStyle = UIModalPresentationFullScreen;
     cameraPicker.showsCameraControls = YES;
