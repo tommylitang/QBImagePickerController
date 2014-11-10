@@ -209,15 +209,19 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 
 #pragma mark - Validating Selections
 
-- (BOOL)validateNumberOfSelections:(NSUInteger)numberOfSelections
+- (BOOL)validateNumberOfSelectionsWithImageCount:(NSUInteger)imageCount videoCount:(NSUInteger)videoCount
 {
     // Check the number of selected assets
-    NSUInteger minimumNumberOfSelection = MAX(1, self.minimumNumberOfSelection);
-    BOOL qualifiesMinimumNumberOfSelection = (numberOfSelections >= minimumNumberOfSelection);
+    NSUInteger minimumNumberOfImageSelection = MAX(1, self.minimumNumberOfImageSelection);
+    NSUInteger minimumNumberOfVideoSelection = MAX(1, self.minimumNumberOfVideoSelection);
+    BOOL qualifiesMinimumNumberOfSelection = (imageCount >= minimumNumberOfImageSelection) && (videoCount >= minimumNumberOfVideoSelection);
     
     BOOL qualifiesMaximumNumberOfSelection = YES;
-    if (minimumNumberOfSelection <= self.maximumNumberOfSelection) {
-        qualifiesMaximumNumberOfSelection = (numberOfSelections <= self.maximumNumberOfSelection);
+    if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
+        qualifiesMaximumNumberOfSelection = (imageCount <= self.maximumNumberOfImageSelection);
+    }
+    if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
+        qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection || (videoCount <= self.maximumNumberOfVideoSelection);
     }
     
     return (qualifiesMinimumNumberOfSelection && qualifiesMaximumNumberOfSelection);
@@ -384,6 +388,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         [self.selectedAssetURLs addObject:assetURL];
         
         // Validation
+        self.selectedAssetURLs
         self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.selectedAssetURLs.count];
     } else {
         // Delegate
