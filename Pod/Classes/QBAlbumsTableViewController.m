@@ -15,6 +15,8 @@
 #import "QBAssetsCollectionViewController.h"
 
 #import "Util.h"
+#import <MobileCoreServices/UTCoreTypes.h>
+#import <MobileCoreServices/UTType.h>
 
 ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type) {
     switch (type) {
@@ -184,15 +186,25 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     [self dismissViewControllerAnimated:YES completion:nil];
-    NSLog(@"Camera took image");
-    [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerOriginalImage]).CGImage
-                                            metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
-                                     completionBlock:^(NSURL *assetURL, NSError *error) {
-         if(!error && assetURL != nil) {
-             [self.selectedAssetURLs addObject:assetURL];
-             [self passSelectedAssetsToDelegate];
-         }
-     }];
+    
+    void (^saveCompletionHandler)(NSURL*, NSError*)= ^(NSURL *assetURL, NSError *error) {
+        if(!error && assetURL != nil) {
+            [self.selectedAssetURLs addObject:assetURL];
+            [self passSelectedAssetsToDelegate];
+        }
+    };
+    
+    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    if(UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeImage)) {
+        DLog(@"Camera took image");
+        [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerOriginalImage]).CGImage
+                                                metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
+                                         completionBlock:saveCompletionHandler];
+        
+    } else if(UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeMovie)) {
+        DLog(@"Camera took video");
+        [self.assetsLibrary writeVideoAtPathToSavedPhotosAlbum:[info objectForKey:UIImagePickerControllerMediaURL] completionBlock:saveCompletionHandler];
+    }
 }
 
 #pragma mark - Validating Selections
