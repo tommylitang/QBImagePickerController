@@ -295,7 +295,7 @@
         qualifiesMaximumNumberOfSelection = (imageCount <= self.maximumNumberOfImageSelection);
     }
     if (minimumNumberOfVideoSelection <= self.maximumNumberOfVideoSelection) {
-        qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection || (videoCount <= self.maximumNumberOfVideoSelection);
+        qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection && (videoCount <= self.maximumNumberOfVideoSelection);
     }
     
     return qualifiesMaximumNumberOfSelection;
