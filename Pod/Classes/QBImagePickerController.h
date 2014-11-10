@@ -19,6 +19,6 @@
 + (BOOL)isAccessible;
 + (BOOL)cameraIsAccessible;
 
-- (void)provideDestinationViewController:(UIViewController *)destinationViewController;
+//- (void)provideDestinationViewController:(UIViewController *)destinationViewController;
 
 @end

@@ -14,6 +14,10 @@
 #import "QBAssetsCollectionViewLayout.h"
 #import "QBAssetsCollectionViewController.h"
 
+#import "Util.h"
+#import <MobileCoreServices/UTCoreTypes.h>
+#import <MobileCoreServices/UTType.h>
+
 ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePickerControllerFilterType type) {
     switch (type) {
         case QBImagePickerControllerFilterTypeNone:
@@ -160,7 +164,17 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     NSLog(@"Opening Camera");
     
     UIImagePickerController *cameraPicker = [[UIImagePickerController alloc] init];
-    cameraPicker.allowsEditing = YES;
+//    cameraPicker.allowsEditing = YES;
+
+    NSArray *supportedTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
+    NSArray *videoSupported = [supportedTypes filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"(SELF contains %@)", @"movie"]];
+    if([videoSupported count] > 0) {
+        DLog(@"Video capture supported");
+    } else {
+        DLog(@"Video capture unsupported");
+    }
+
+    cameraPicker.mediaTypes = supportedTypes; // Enable all supported media types
     cameraPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
     cameraPicker.modalPresentationStyle = UIModalPresentationFullScreen;
     cameraPicker.showsCameraControls = YES;
@@ -171,18 +185,26 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    NSLog(@"Camera took image");
-    [self dismissViewControllerAnimated:YES completion:^{}];
+    [self dismissViewControllerAnimated:YES completion:nil];
     
-    [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerEditedImage]).CGImage
-                                            metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
-                                     completionBlock:^(NSURL *assetURL, NSError *error)
-     {
-         if(!error) {
-             [self.selectedAssetURLs addObject:assetURL];
-             [self passSelectedAssetsToDelegate];
-         }
-     }];
+    void (^saveCompletionHandler)(NSURL*, NSError*)= ^(NSURL *assetURL, NSError *error) {
+        if(!error && assetURL != nil) {
+            [self.selectedAssetURLs addObject:assetURL];
+            [self passSelectedAssetsToDelegate];
+        }
+    };
+    
+    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    if(UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeImage)) {
+        DLog(@"Camera took image");
+        [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerOriginalImage]).CGImage
+                                                metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
+                                         completionBlock:saveCompletionHandler];
+        
+    } else if(UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeMovie)) {
+        DLog(@"Camera took video");
+        [self.assetsLibrary writeVideoAtPathToSavedPhotosAlbum:[info objectForKey:UIImagePickerControllerMediaURL] completionBlock:saveCompletionHandler];
+    }
 }
 
 #pragma mark - Validating Selections
