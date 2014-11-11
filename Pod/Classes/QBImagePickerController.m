@@ -143,7 +143,9 @@
                 
             }
         } failureBlock:^(NSError *error) {
+#ifdef DEBUG
             NSLog(@"Error: %@", [error localizedDescription]);
+#endif
         }];
     }
 }

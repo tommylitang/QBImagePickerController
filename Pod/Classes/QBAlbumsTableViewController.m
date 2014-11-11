@@ -14,7 +14,6 @@
 #import "QBAssetsCollectionViewLayout.h"
 #import "QBAssetsCollectionViewController.h"
 
-#import "Util.h"
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <MobileCoreServices/UTType.h>
 
@@ -162,7 +161,9 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 
 - (void)cameraAction:(id)sender
 {
+#ifdef DEBUG
     NSLog(@"Opening Camera");
+#endif
     
     UIImagePickerController *cameraPicker = [[UIImagePickerController alloc] init];
 //    cameraPicker.allowsEditing = YES;
@@ -170,9 +171,13 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     NSArray *supportedTypes = [UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeCamera];
     NSArray *videoSupported = [supportedTypes filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"(SELF contains %@)", @"movie"]];
     if([videoSupported count] > 0) {
-        DLog(@"Video capture supported");
+#ifdef DEBUG
+        NSLog(@"Video capture supported");
+#endif
     } else {
-        DLog(@"Video capture unsupported");
+#ifdef DEBUG
+        NSLog(@"Video capture unsupported");
+#endif
     }
 
     cameraPicker.mediaTypes = supportedTypes; // Enable all supported media types
@@ -197,13 +202,17 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     
     NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
     if(UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeImage)) {
-        DLog(@"Camera took image");
+#ifdef DEBUG
+        NSLog(@"Camera took image");
+#endif
         [self.assetsLibrary writeImageToSavedPhotosAlbum:((UIImage*)[info objectForKey:UIImagePickerControllerOriginalImage]).CGImage
                                                 metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
                                          completionBlock:saveCompletionHandler];
         
     } else if(UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeMovie)) {
-        DLog(@"Camera took video");
+#ifdef DEBUG
+        NSLog(@"Camera took video");
+#endif
         [self.assetsLibrary writeVideoAtPathToSavedPhotosAlbum:[info objectForKey:UIImagePickerControllerMediaURL] completionBlock:saveCompletionHandler];
     }
 }
@@ -288,7 +297,9 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
                                                   }
                                               }
                                           } failureBlock:^(NSError *error) {
+#ifdef DEBUG
                                               NSLog(@"Error: %@", [error localizedDescription]);
+#endif
                                           }];
     }
 }
@@ -346,7 +357,9 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
                                     }
                                 }
                             } failureBlock:^(NSError *error) {
+#ifdef DEBUG
                                 NSLog(@"Error: %@", [error localizedDescription]);
+#endif
                             }];
     }
 }
