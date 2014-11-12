@@ -33,14 +33,20 @@ UIKIT_EXTERN ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType
 @property (nonatomic, strong, readonly) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, copy,   readonly) NSArray *assetsGroups;
 @property (nonatomic, strong, readonly) NSMutableOrderedSet *selectedAssetURLs;
+@property (nonatomic, assign) NSUInteger numberOfSelectedImages;
+@property (nonatomic, assign) NSUInteger numberOfSelectedVideos;
 
 @property (nonatomic, weak) id<QBImagePickerControllerDelegate> delegate;
 @property (nonatomic, copy) NSArray *groupTypes;
 @property (nonatomic, assign) QBImagePickerControllerFilterType filterType;
 @property (nonatomic, assign) BOOL showsCancelButton;
 @property (nonatomic, assign) BOOL allowsMultipleSelection;
-@property (nonatomic, assign) NSUInteger minimumNumberOfSelection;
-@property (nonatomic, assign) NSUInteger maximumNumberOfSelection;
+//@property (nonatomic, assign) NSUInteger minimumNumberOfSelection;
+@property (nonatomic, assign) NSUInteger minimumNumberOfImageSelection;
+@property (nonatomic, assign) NSUInteger minimumNumberOfVideoSelection;
+//@property (nonatomic, assign) NSUInteger maximumNumberOfSelection;
+@property (nonatomic, assign) NSUInteger maximumNumberOfImageSelection;
+@property (nonatomic, assign) NSUInteger maximumNumberOfVideoSelection;
 @property (nonatomic, assign) NSString *rightNavigationItemTitle;
 
 + (BOOL)isAccessible;

@@ -111,8 +111,10 @@
 
         _selectedAssetsController.allowsMultipleSelection = YES;
         _selectedAssetsController.filterType = self.albumsController.filterType;
-        _selectedAssetsController.minimumNumberOfSelection = self.albumsController.minimumNumberOfSelection;
-        _selectedAssetsController.maximumNumberOfSelection = self.albumsController.maximumNumberOfSelection;
+        _selectedAssetsController.minimumNumberOfImageSelection = self.albumsController.minimumNumberOfImageSelection;
+        _selectedAssetsController.minimumNumberOfVideoSelection = self.albumsController.minimumNumberOfVideoSelection;
+        _selectedAssetsController.maximumNumberOfImageSelection = self.albumsController.maximumNumberOfImageSelection;
+        _selectedAssetsController.maximumNumberOfVideoSelection = self.albumsController.maximumNumberOfVideoSelection;
         _selectedAssetsController.delegate = (id<QBAssetsCollectionViewControllerDelegate>)self.albumsController;
     }
 
@@ -141,7 +143,9 @@
                 
             }
         } failureBlock:^(NSError *error) {
+#ifdef DEBUG
             NSLog(@"Error: %@", [error localizedDescription]);
+#endif
         }];
     }
 }

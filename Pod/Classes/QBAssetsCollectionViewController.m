@@ -12,6 +12,9 @@
 #import "QBAssetsCollectionViewCell.h"
 #import "QBAssetsCollectionFooterView.h"
 
+#import <MobileCoreServices/UTCoreTypes.h>
+#import <MobileCoreServices/UTType.h>
+
 @interface QBAssetsCollectionViewController ()
 
 @property (nonatomic, strong) NSMutableArray *assets;
@@ -61,7 +64,8 @@
     
     // Validation
     if (self.allowsMultipleSelection) {
-        self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:self.imagePickerController.selectedAssetURLs.count];
+        self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelectionsWithImageCount:self.imagePickerController.numberOfSelectedImages
+                                                                                             videoCount:self.imagePickerController.numberOfSelectedVideos];
         [self.navigationItem.rightBarButtonItem setTitle:self.imagePickerController.rightNavigationItemTitle];
     }
     
@@ -263,30 +267,40 @@
 
 #pragma mark - Validating Selections
 
-- (BOOL)validateNumberOfSelections:(NSUInteger)numberOfSelections
+- (BOOL)validateNumberOfSelectionsWithImageCount:(NSUInteger)imageCount videoCount:(NSUInteger)videoCount
 {
-    NSUInteger minimumNumberOfSelection = MAX(1, self.minimumNumberOfSelection);
-    BOOL qualifiesMinimumNumberOfSelection = (numberOfSelections >= minimumNumberOfSelection);
+    // Check the number of selected assets
+    NSUInteger minimumNumberOfImageSelection = MAX(0 /* 1 */, self.minimumNumberOfImageSelection);
+    NSUInteger minimumNumberOfVideoSelection = MAX(0 /* 1 */, self.minimumNumberOfVideoSelection);
+    BOOL qualifiesMinimumNumberOfSelection = (imageCount >= minimumNumberOfImageSelection)
+        && (videoCount >= minimumNumberOfVideoSelection) && imageCount + videoCount >= 1;
     
     BOOL qualifiesMaximumNumberOfSelection = YES;
-    if (minimumNumberOfSelection <= self.maximumNumberOfSelection) {
-        qualifiesMaximumNumberOfSelection = (numberOfSelections <= self.maximumNumberOfSelection);
+    if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
+        qualifiesMaximumNumberOfSelection = (imageCount <= self.maximumNumberOfImageSelection);
+    }
+    if (minimumNumberOfVideoSelection <= self.maximumNumberOfVideoSelection) {
+        qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection || (videoCount <= self.maximumNumberOfVideoSelection);
     }
     
     return (qualifiesMinimumNumberOfSelection && qualifiesMaximumNumberOfSelection);
 }
 
-- (BOOL)validateMaximumNumberOfSelections:(NSUInteger)numberOfSelections
+- (BOOL)validateMaximumNumberOfSelectionsWithImageCount:(NSUInteger)imageCount videoCount:(NSUInteger)videoCount
 {
-    NSUInteger minimumNumberOfSelection = MAX(1, self.minimumNumberOfSelection);
+    NSUInteger minimumNumberOfImageSelection = MAX(0 /* 1 */, self.minimumNumberOfImageSelection);
+    NSUInteger minimumNumberOfVideoSelection = MAX(0 /* 1 */, self.minimumNumberOfVideoSelection);
     
-    if (minimumNumberOfSelection <= self.maximumNumberOfSelection) {
-        return (numberOfSelections <= self.maximumNumberOfSelection);
+    BOOL qualifiesMaximumNumberOfSelection = YES;
+    if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
+        qualifiesMaximumNumberOfSelection = (imageCount <= self.maximumNumberOfImageSelection);
+    }
+    if (minimumNumberOfVideoSelection <= self.maximumNumberOfVideoSelection) {
+        qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection && (videoCount <= self.maximumNumberOfVideoSelection);
     }
     
-    return YES;
+    return qualifiesMaximumNumberOfSelection;
 }
-
 
 #pragma mark - UICollectionViewDataSource
 
@@ -375,7 +389,13 @@
 
 - (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    return [self validateMaximumNumberOfSelections:(self.imagePickerController.selectedAssetURLs.count + 1)];
+    ALAsset *asset = self.assets[indexPath.row];
+    
+    BOOL selectedImage = [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypePhoto]; // Will be YES/NO or NO/YES
+    BOOL selectedVideo = [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypeVideo];
+    
+    return [self validateMaximumNumberOfSelectionsWithImageCount:(self.imagePickerController.numberOfSelectedImages + selectedImage)
+                                                      videoCount:(self.imagePickerController.numberOfSelectedVideos + selectedVideo)];
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
@@ -384,7 +404,11 @@
     
     // Validation
     if (self.allowsMultipleSelection) {
-        self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:(self.imagePickerController.selectedAssetURLs.count + 1)];
+        BOOL selectedImage = [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypePhoto]; // Will be YES/NO or NO/YES
+        BOOL selectedVideo = [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypeVideo];
+        
+        self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelectionsWithImageCount:(self.imagePickerController.numberOfSelectedImages + selectedImage)
+                                                                                             videoCount:(self.imagePickerController.numberOfSelectedVideos + selectedVideo)];
     }
     
     // Delegate
@@ -399,7 +423,11 @@
     
     // Validation
     if (self.allowsMultipleSelection) {
-        self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelections:(self.imagePickerController.selectedAssetURLs.count - 1)];
+        BOOL selectedImage = [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypePhoto]; // Will be YES/NO or NO/YES
+        BOOL selectedVideo = [[asset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypeVideo];
+        
+        self.navigationItem.rightBarButtonItem.enabled = [self validateNumberOfSelectionsWithImageCount:(self.imagePickerController.numberOfSelectedImages - selectedImage)
+                                                                                             videoCount:(self.imagePickerController.numberOfSelectedVideos - selectedVideo)];
     }
     
     // Delegate
