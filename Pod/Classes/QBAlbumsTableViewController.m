@@ -102,7 +102,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
 - (void)setShowsPhotostream:(BOOL)showsPhotostream
 {
     _showsPhotostream = showsPhotostream;
-    if(_showsPhotostream) {
+    if(!_showsPhotostream) {
         [ALAssetsLibrary disableSharedPhotoStreamsSupport];
     }
 }
