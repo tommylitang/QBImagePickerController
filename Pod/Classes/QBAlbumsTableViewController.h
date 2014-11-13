@@ -31,6 +31,7 @@ UIKIT_EXTERN ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType
 @interface QBAlbumsTableViewController : UITableViewController
 
 @property (nonatomic, strong, readonly) ALAssetsLibrary *assetsLibrary;
+@property (nonatomic, assign) BOOL showsPhotostream;
 @property (nonatomic, copy,   readonly) NSArray *assetsGroups;
 @property (nonatomic, strong, readonly) NSMutableOrderedSet *selectedAssetURLs;
 @property (nonatomic, assign) NSUInteger numberOfSelectedImages;

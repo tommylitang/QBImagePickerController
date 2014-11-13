@@ -99,6 +99,14 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
     self.rightNavigationItemTitle = @"Done";
 }
 
+- (void)setShowsPhotostream:(BOOL)showsPhotostream
+{
+    _showsPhotostream = showsPhotostream;
+    if(_showsPhotostream) {
+        [ALAssetsLibrary disableSharedPhotoStreamsSupport];
+    }
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
