@@ -15,6 +15,9 @@
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <MobileCoreServices/UTType.h>
 
+#define IDIOM    UI_USER_INTERFACE_IDIOM()
+#define IPAD     UIUserInterfaceIdiomPad
+
 @interface QBAssetsCollectionViewController ()
 
 @property (nonatomic, strong) NSMutableArray *assets;
@@ -334,9 +337,7 @@
 {
     if (kind == UICollectionElementKindSectionFooter) {
         QBAssetsCollectionFooterView *footerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
-                                                                                      withReuseIdentifier:@"FooterView"
-                                                                                             forIndexPath:indexPath];
-        
+                                                                                      withReuseIdentifier:@"FooterView" forIndexPath:indexPath];
         switch (self.filterType) {
             case QBImagePickerControllerFilterTypeNone:{
                 NSString *format;
@@ -379,7 +380,11 @@
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    return CGSizeMake(77.5, 77.5);
+    if (IDIOM == IPAD) {
+        return CGSizeMake(125, 125);
+    } else {
+        return CGSizeMake(77.5, 77.5);
+    }
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section
