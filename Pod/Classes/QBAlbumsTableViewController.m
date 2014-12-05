@@ -256,6 +256,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         if (UTTypeConformsTo(uttype, kUTTypeImage)) {
             imageCount++;
         }
+        CFRelease(uttype);
     }
     return imageCount;
 }
@@ -268,6 +269,7 @@ ALAssetsFilter *ALAssetsFilterFromQBImagePickerControllerFilterType(QBImagePicke
         if (UTTypeConformsTo(uttype, kUTTypeMovie)) {
             videoCount++;
         }
+        CFRelease(uttype);
     }
     return videoCount;
 }
