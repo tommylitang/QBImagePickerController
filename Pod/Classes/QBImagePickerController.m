@@ -154,14 +154,16 @@
 
 - (void)setupBottomToolbar
 {
+    SEL selectorCameraAction = NSSelectorFromString(@"cameraAction:");
+    
     UIBarButtonItem *flexibleSpace  = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                                                                     target:nil action:nil];
     UIBarButtonItem *cameraButton   = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
-                                                                                    target:self.albumsController action:@selector(cameraAction:)];
+                                                                                    target:self.albumsController action:selectorCameraAction];
     UIBarButtonItem *segmentControl = [[UIBarButtonItem alloc] initWithCustomView:self.segmentControl];
     
     
-    cameraButton.enabled = [QBAlbumsTableViewController cameraIsAccessible];
+    cameraButton.enabled = [QBAlbumsTableViewController cameraIsAccessible] && [self.albumsController respondsToSelector:selectorCameraAction];
     
     UIToolbar *toolbar = [[UIToolbar alloc] init];
     [toolbar setItems:@[flexibleSpace, segmentControl, flexibleSpace, cameraButton]];
