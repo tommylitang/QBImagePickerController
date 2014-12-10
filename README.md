@@ -1,15 +1,6 @@
 # QBImagePickerController
 A clone of UIImagePickerController with multiple selection support and other useful extensions.
 
-
-## Installation
-QBImagePickerController is available in CocoaPods.
-
-    pod 'QBImagePickerController'
-
-If you want to install manually, download this repository and copy files in QBImagePickerController directory to your project, and link `AssetsLibrary.framework`.
-
-
 ## Example
 ### Check If Source is Accessible
     if (![QBImagePickerController isAccessible]) {
