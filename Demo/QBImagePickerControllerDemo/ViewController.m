@@ -26,22 +26,26 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     QBImagePickerController *imagePickerController = [[QBImagePickerController alloc] init];
-    imagePickerController.delegate = self;
-    imagePickerController.allowsMultipleSelection = (indexPath.section == 1);
+    imagePickerController.albumsController.delegate = self;
+    imagePickerController.albumsController.allowsMultipleSelection = (indexPath.section == 1);
     
     if (indexPath.section == 1) {
         switch (indexPath.row) {
             case 1:
-                imagePickerController.minimumNumberOfSelection = 3;
+                imagePickerController.albumsController.minimumNumberOfImageSelection = 3;
+                imagePickerController.albumsController.minimumNumberOfVideoSelection = 2;
                 break;
                 
             case 2:
-                imagePickerController.maximumNumberOfSelection = 6;
+                imagePickerController.albumsController.maximumNumberOfImageSelection = 6;
+                imagePickerController.albumsController.maximumNumberOfVideoSelection = 8;
                 break;
                 
             case 3:
-                imagePickerController.minimumNumberOfSelection = 3;
-                imagePickerController.maximumNumberOfSelection = 6;
+                imagePickerController.albumsController.minimumNumberOfImageSelection = 1;
+                imagePickerController.albumsController.minimumNumberOfVideoSelection = 1;
+                imagePickerController.albumsController.maximumNumberOfImageSelection = 3;
+                imagePickerController.albumsController.maximumNumberOfVideoSelection = 3;
                 break;
                 
             default:
