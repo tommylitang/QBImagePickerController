@@ -27,25 +27,28 @@
 {
     QBImagePickerController *imagePickerController = [[QBImagePickerController alloc] init];
     imagePickerController.albumsController.delegate = self;
+    imagePickerController.albumsController.filterType = QBImagePickerControllerFilterTypeNone;
     imagePickerController.albumsController.allowsMultipleSelection = (indexPath.section == 1);
+    imagePickerController.albumsController.showsPhotostream = NO;
     
     if (indexPath.section == 1) {
         switch (indexPath.row) {
+            // Case 0: select anything number
             case 1:
                 imagePickerController.albumsController.minimumNumberOfImageSelection = 3;
-                imagePickerController.albumsController.minimumNumberOfVideoSelection = 2;
                 break;
                 
             case 2:
-                imagePickerController.albumsController.maximumNumberOfImageSelection = 6;
-                imagePickerController.albumsController.maximumNumberOfVideoSelection = 8;
+                imagePickerController.albumsController.minimumNumberOfVideoSelection = 2;
                 break;
                 
             case 3:
-                imagePickerController.albumsController.minimumNumberOfImageSelection = 1;
-                imagePickerController.albumsController.minimumNumberOfVideoSelection = 1;
-                imagePickerController.albumsController.maximumNumberOfImageSelection = 3;
-                imagePickerController.albumsController.maximumNumberOfVideoSelection = 3;
+                imagePickerController.albumsController.maximumNumberOfImageSelection = 6;
+                break;
+                
+            case 4:
+                imagePickerController.albumsController.minimumNumberOfImageSelection = 3;
+                imagePickerController.albumsController.maximumNumberOfImageSelection = 6;
                 break;
                 
             default:
