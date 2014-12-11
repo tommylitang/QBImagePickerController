@@ -33,7 +33,10 @@
     
     if (indexPath.section == 1) {
         switch (indexPath.row) {
-            // Case 0: select anything number
+            case 0:
+                // No min or max, allow selection on everything
+                break;
+                
             case 1:
                 imagePickerController.albumsController.minimumNumberOfImageSelection = 3;
                 break;
@@ -44,6 +47,7 @@
                 
             case 3:
                 imagePickerController.albumsController.maximumNumberOfImageSelection = 6;
+                imagePickerController.albumsController.maximumNumberOfVideoSelection = 3;
                 break;
                 
             case 4:

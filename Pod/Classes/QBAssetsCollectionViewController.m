@@ -267,22 +267,20 @@
     }
 }
 
-
 #pragma mark - Validating Selections
 
 - (BOOL)validateNumberOfSelectionsWithImageCount:(NSUInteger)imageCount videoCount:(NSUInteger)videoCount
 {
     // Check the number of selected assets
-    NSUInteger minimumNumberOfImageSelection = MAX(0 /* 1 */, self.minimumNumberOfImageSelection);
-    NSUInteger minimumNumberOfVideoSelection = MAX(0 /* 1 */, self.minimumNumberOfVideoSelection);
-    BOOL qualifiesMinimumNumberOfSelection = (imageCount >= minimumNumberOfImageSelection)
-        && (videoCount >= minimumNumberOfVideoSelection) && imageCount + videoCount >= 1;
+    BOOL qualifiesMinimumNumberOfSelection = (imageCount >= self.minimumNumberOfImageSelection) &&
+                                             (videoCount >= self.minimumNumberOfVideoSelection) &&
+                                              imageCount + videoCount >= 1;
     
     BOOL qualifiesMaximumNumberOfSelection = YES;
-    if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
+    if (MAX(1, self.minimumNumberOfImageSelection) <= self.maximumNumberOfImageSelection) {
         qualifiesMaximumNumberOfSelection = (imageCount <= self.maximumNumberOfImageSelection);
     }
-    if (minimumNumberOfVideoSelection <= self.maximumNumberOfVideoSelection) {
+    if (MAX(1, self.minimumNumberOfVideoSelection) <= self.maximumNumberOfVideoSelection) {
         qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection || (videoCount <= self.maximumNumberOfVideoSelection);
     }
     
@@ -291,14 +289,11 @@
 
 - (BOOL)validateMaximumNumberOfSelectionsWithImageCount:(NSUInteger)imageCount videoCount:(NSUInteger)videoCount
 {
-    NSUInteger minimumNumberOfImageSelection = MAX(0 /* 1 */, self.minimumNumberOfImageSelection);
-    NSUInteger minimumNumberOfVideoSelection = MAX(0 /* 1 */, self.minimumNumberOfVideoSelection);
-    
     BOOL qualifiesMaximumNumberOfSelection = YES;
-    if (minimumNumberOfImageSelection <= self.maximumNumberOfImageSelection) {
+    if (MAX(1, self.minimumNumberOfImageSelection) <= self.maximumNumberOfImageSelection) {
         qualifiesMaximumNumberOfSelection = (imageCount <= self.maximumNumberOfImageSelection);
     }
-    if (minimumNumberOfVideoSelection <= self.maximumNumberOfVideoSelection) {
+    if (MAX(1, self.minimumNumberOfVideoSelection) <= self.maximumNumberOfVideoSelection) {
         qualifiesMaximumNumberOfSelection = qualifiesMaximumNumberOfSelection && (videoCount <= self.maximumNumberOfVideoSelection);
     }
     
