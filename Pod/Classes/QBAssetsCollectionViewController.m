@@ -72,7 +72,7 @@
         [self.navigationItem.rightBarButtonItem setTitle:self.imagePickerController.rightNavigationItemTitle];
     }
     
-    [self setupBottomToolbar];
+   // [self setupBottomToolbar];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

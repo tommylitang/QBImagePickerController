@@ -27,7 +27,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     
     [self setupPageView];
-    [self setupBottomToolbar];
+    //[self setupBottomToolbar];
     
 }
 
